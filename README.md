@@ -1,2 +1,0 @@
-# ZleceniaApp
-a simple exercise
