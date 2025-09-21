@@ -3,20 +3,121 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vite + Lit + TS</title>
-  <link rel="stylesheet" href="./src/index.css" />
-  <script type="module" src="/src/auth/account-panel.ts"></script>
-  <script type="module" src="/src/my-element.ts"></script>
+  <title>Vite + TS</title>
+  <link rel="stylesheet" href="/src/style.css">
+  <script type="module" src="/src/elements/profile-picture.ts"></script>
+  <script type="module" src="/src/elements/query-profile.ts"></script>
+  <script type="module" src="/src/elements/toggle-button.ts"></script>
+  <script type="module" src="/src/elements/text-display.ts"></script>
+  <script type="module" src="/src/elements/side-panel.ts"></script>
+  <script type="module" src="/src/elements/tab-button.ts"></script>
+  <script type="module" src="/src/elements/paged-view.ts"></script>
+  <script type="module" src="/src/elements/login-form.ts"></script>
+  <script type="module" src="/src/elements/tab-group.ts"></script>
 </head>
 
 <body>
-  <button onclick="document.querySelector('account-panel').toggle()">Click</button>
-  <account-panel>
-    heeeelo
-  </account-panel>
-  <my-element></my-element>
+  <div style="flex-basis: 300px;">
+    <side-panel>
+      <nav style="height: 100%; display: flex; flex-direction: column; padding: 10px">
+        <tab-group value="browse" @value="main>paged-view%page">
+          <tab-button value="browse">Browse</tab-button>
+          <tab-button value="search">Search</tab-button>
+          <tab-button value="offers">My offers</tab-button>
+          <tab-button value="requests">My requests</tab-button>
+          <br />
+          <toggle-button clicked @clicked="nav>tab-group>tab-group%hidden" small>
+            <span slot="off">-close</span>
+            <span slot="on">more...</span>
+          </toggle-button>
+          <tab-group disabled>
+            <tab-button value="articles">Articles</tab-button>
+          </tab-group>
+        </tab-group>
+      </nav>
+    </side-panel>
+  </div>
+  <div style="display: flex; flex-direction: column; height: 100vh; flex-grow: 7;">
+    <header style="display: grid; grid-template-columns: auto 1fr auto;">
+      <toggle-button @clicked="side-panel:has(>nav)%opened" aria-label="Menu">
+        <span slot="on">&lt;</span>
+        <span slot="off">&gt;</span>
+      </toggle-button>
+      <h1 style="text-align: center;">TechniZlecenia</h1>
+      <toggle-button @clicked="side-panel:has(login-form)%opened" aria-label="Profile">
+        <profile-picture slot="off"></profile-picture>
+        <span slot="on">X</span>
+      </toggle-button>
+    </header>
+    <main style="flex-grow: 1; overflow-y: auto;">
+      <paged-view>
+        <div slot="browse">
+          browsing
+        </div>
+        <div slot="search">
+          search
+        </div>
+        <div slot="offers">
+          offers
+        </div>
+        <div slot="requests">
+          requests
+        </div>
+        <div slot="articles">
+          articles
+        </div>
+      </paged-view>
+    </main>
+    <footer>
+      <ul>
+        <span>Repos:</span>
+        <a href="https://github.com/UnnamedShadow/TechniZlecenia">Frontend</a>
+        <a href="https://github.com/chrontax/techni-zlecenia-backend">Backend</a>
+      </ul>
+    </footer>
+  </div>
+  <div style="flex-basis: 300px; display: flex; justify-content: flex-end;">
+    <side-panel>
+      <login-form @logged-out="side-panel>query-profile%hidden" @jwt="profile-picture%jwt">
+        <form slot="register" style="border: blue 1px solid; border-radius: 4px;">
+          <input type="text" name="username" placeholder="Username" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <button type="submit">Register</button>
+          <a href=""
+            onclick="event.preventDefault(); document.querySelector('login-form').toggleAttribute('registering', false)"
+            style="color: gray;">
+            Already have an account?
+          </a>
+        </form>
+        <form slot="login" style="border: blue 1px solid; border-radius: 4px;">
+          <input type="username" name="username" placeholder="Username" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <button type="submit">Log in</button>
+          <a href=""
+            onclick="event.preventDefault(); document.querySelector('login-form').toggleAttribute('registering', true)"
+            style="color: gray;">
+            Don't have an account?
+          </a>
+        </form>
+      </login-form>
+      <query-profile @username="query-profile>h2>text-display%content" @email="query-profile>h3>text-display%content"
+        @id="query-profile>h4>text-display%content">
+        <h2>
+          <profile-picture></profile-picture>
+          <text-display></text-display>
+        </h2>
+        <h3>
+          <text-display></text-display>
+        </h3>
+        <h4>
+          <text-display></text-display>
+        </h4>
+      </query-profile>
+    </side-panel>
+  </div>
 </body>
 
 </html>
