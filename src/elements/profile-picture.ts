@@ -2,9 +2,13 @@ import { BaseElement, html } from "./base"
 import anonIcon from "../assets/person_off_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg"
 
 export default class ProfilePicture extends BaseElement {
-    static override observedAttributes = [...super.observedAttributes, 'jwt'];
+    static override observedAttributes = [...super.observedAttributes, 'jwt', 'user_id'];
 
     render() {
+        const id = this.getAttribute('user_id')
+        if (id) return html`
+            <img src="https://api.dicebear.com/9.x/bottts/webp?seed=${id}" width="35px" height="35px"/>
+        `
         const jwt = this.getAttribute('jwt')
         if (jwt === null)
             return html`

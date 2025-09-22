@@ -7,6 +7,9 @@ export default abstract class TemplateList<T> extends BaseElement {
         while (this.elements.length < list.length) {
             this.elements.push(Array.from(this.querySelectorAll('[slot=item]')).map(c => c.cloneNode(true) as HTMLElement))
         }
+        while (this.elements.length > list.length) {
+            this.elements.pop()
+        }
         return this.elements.reduce((p, c, i) => {
             return html`${p}${{ id: i.toString(), elem: c }}`
         }, html``)

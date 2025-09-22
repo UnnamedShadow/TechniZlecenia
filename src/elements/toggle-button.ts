@@ -13,7 +13,7 @@ export default class ToggleButton extends BaseElement {
                     border: none;
                     border-radius: 10px;
                     min-height: ${this.hasAttribute('small') ? '25px' : '50px'};
-                    background: ${this.hasAttribute('small') ? 'none' : 'default'};
+                    background: ${this.hasAttribute('small') ? 'none' : 'revert'};
                     min-width: 50px;
                 }
             </style>

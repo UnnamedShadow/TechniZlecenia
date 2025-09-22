@@ -14,6 +14,7 @@
   <script type="module" src="/src/elements/query-profile.ts"></script>
   <script type="module" src="/src/elements/toggle-button.ts"></script>
   <script type="module" src="/src/elements/text-display.ts"></script>
+  <script type="module" src="/src/elements/query-search.ts"></script>
   <script type="module" src="/src/elements/create-form.ts"></script>
   <script type="module" src="/src/elements/side-panel.ts"></script>
   <script type="module" src="/src/elements/tab-button.ts"></script>
@@ -22,6 +23,7 @@
   <script type="module" src="/src/elements/order-list.ts"></script>
   <script type="module" src="/src/elements/image-list.ts"></script>
   <script type="module" src="/src/elements/tab-group.ts"></script>
+  <script type="module" src="/src/elements/user-list.ts"></script>
 </head>
 
 <body style="overflow: hidden;">
@@ -71,36 +73,53 @@
           </div>
         </div>
         <div slot="search">
-          <search-form>
-            <order-list slot="orders" $name="h3>text-display.name%content" $price="h3 text-display.price%content"
-              $description="p>text-display%content" $order_id="small>text-display.order%content;button%order_id"
-              $created_at="small>text-display.created_at%content" $image_urls="image-list%data">
-              <div slot="item">
-                <h3>
-                  <text-display class="name"></text-display>
-                  <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
-                  <button type="button"
-                    onclick="document.querySelector('order-details').setAttribute('current', event.target.getAttribute('order_id'))">
-                    Details
-                  </button>
-                </h3>
-                <p>
-                  Description:
-                  <br />
-                  <text-display></text-display>
-                </p>
-                <div>
-                  <image-list $src="%src">
-                    <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
-                  </image-list>
+          <toggle-button @clicked="query-search%is_user">
+            <span slot="off">searching orders</span>
+            <span slot="on">searching users</span>
+          </toggle-button>
+          <input type="search" placeholder="Search"
+            oninput="document.querySelector('div[slot=search]>query-search').setAttribute('query', event.target.value)" />
+          <query-search @type="query-search>paged-view%page"
+            @data="query-search order-list%data;query-search user-list%data">
+            <paged-view>
+              <order-list slot="orders" $name="h3>text-display.name%content" $price="h3 text-display.price%content"
+                $description="p>text-display%content" $order_id="small>text-display.order%content;button%order_id"
+                $created_at="small>text-display.created_at%content" $image_urls="image-list%data">
+                <div slot="item">
+                  <h3>
+                    <text-display class="name"></text-display>
+                    <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
+                    <button type="button"
+                      onclick="document.querySelector('order-details').setAttribute('current', event.target.getAttribute('order_id'))">
+                      Details
+                    </button>
+                  </h3>
+                  <p>
+                    Description:
+                    <br />
+                    <text-display></text-display>
+                  </p>
+                  <div>
+                    <image-list $src="%src">
+                      <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
+                    </image-list>
+                  </div>
+                  <small>
+                    <text-display class="order"></text-display>
+                    created at <text-display class="created_at"></text-display>
+                  </small>
                 </div>
-                <small>
-                  <text-display class="order"></text-display>
-                  created at <text-display class="created_at"></text-display>
-                </small>
-              </div>
-            </order-list>
-          </search-form>
+              </order-list>
+              <user-list slot="user" $id="profile-picture%user_id" $name="profile-picture+text-display%content">
+                <div slot="item">
+                  <h3>
+                    <profile-picture></profile-picture>
+                    <text-display></text-display>
+                  </h3>
+                </div>
+              </user-list>
+            </paged-view>
+          </query-search>
         </div>
         <div slot="offers">
           offers
@@ -110,7 +129,7 @@
             <form>
               <input type="text" name="order_name" placeholder="Name" required />
               <textarea name="order_desc" placeholder="Description" required></textarea>
-              <input type="number" name="price" placeholder="Price" required />
+              <input type="number" name="price" placeholder="Price" min="0" step="0.01" required />
               <input type="file" name="images" multiple />
               <button type="submit">Create</button>
             </form>
@@ -175,7 +194,7 @@
   <div style="flex-basis: 300px; display: flex; justify-content: flex-end;">
     <side-panel>
       <login-form @logged-out="side-panel>query-profile%hidden"
-        @jwt="profile-picture%jwt;query-profile%jwt;query-my-orders%jwt;create-form%jwt">
+        @jwt="profile-picture%jwt;query-profile%jwt;query-my-orders%jwt;create-form%jwt;query-search%jwt">
         <form slot="register" style="border: blue 1px solid; border-radius: 4px;">
           <input type="text" name="username" placeholder="Username" required />
           <input type="email" name="email" placeholder="Email" required />
