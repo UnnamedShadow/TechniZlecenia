@@ -35,7 +35,10 @@ export abstract class BaseElement extends HTMLElement {
             if (slot.name[0] !== '_') return
             const id = slot.name.slice(1)
             const elem = rendered.elements[id]
-            slot.assign(...elem)
+            elem.forEach(e => {
+                e.slot = `_${id}`
+                this.append(e)
+            })
         })
         this.attachCallbacks()
     }

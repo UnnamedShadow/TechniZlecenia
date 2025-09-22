@@ -7,16 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vite + TS</title>
   <link rel="stylesheet" href="/src/style.css">
+  <script type="module" src="/src/elements/query-my-orders.ts"></script>
   <script type="module" src="/src/elements/profile-picture.ts"></script>
   <script type="module" src="/src/elements/template-list.ts"></script>
   <script type="module" src="/src/elements/query-profile.ts"></script>
   <script type="module" src="/src/elements/toggle-button.ts"></script>
   <script type="module" src="/src/elements/text-display.ts"></script>
+  <script type="module" src="/src/elements/create-form.ts"></script>
   <script type="module" src="/src/elements/side-panel.ts"></script>
   <script type="module" src="/src/elements/tab-button.ts"></script>
   <script type="module" src="/src/elements/paged-view.ts"></script>
   <script type="module" src="/src/elements/login-form.ts"></script>
   <script type="module" src="/src/elements/order-list.ts"></script>
+  <script type="module" src="/src/elements/image-list.ts"></script>
   <script type="module" src="/src/elements/tab-group.ts"></script>
 </head>
 
@@ -72,11 +75,36 @@
         <div slot="offers">
           offers
         </div>
-        <query-my-orders slot="orders"> <!--@orders="query-my-orders>order-list%data"-->
-          <order-list $order_name="h3>text-display%content"
-            data='[{"order_id": 1, "user_id": 1, "order_name": "test", "order_desc":"???", "price": 10.2, "image_urls": [], "created_at": "2025-08-22T00:00:00Z"}]'>
-            <div>
-              <h3><text-display></text-display></h3>
+        <query-my-orders slot="orders" @orders="query-my-orders>order-list%data">
+          <create-form address="/order">
+            <form>
+              <input type="text" name="order_name" placeholder="Name" required />
+              <textarea name="order_desc" placeholder="Description" required></textarea>
+              <input type="number" name="price" placeholder="Price" required />
+              <input type="file" name="images" multiple />
+              <button type="submit">Create</button>
+            </form>
+          </create-form>
+          <order-list $name="h3>text-display.name%content" $price="h3 text-display.price%content"
+            $description="p>text-display%content" $order_id="small>text-display.order%content"
+            $created_at="small>text-display.created_at%content" $image_urls="image-list%data">
+            <div slot="item">
+              <h3>
+                <text-display class="name"></text-display>
+                <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
+              </h3>
+              <p>
+                Description:
+                <br />
+                <text-display></text-display>
+              </p>
+              <image-list $src="img%src">
+                <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
+              </image-list>
+              <small>
+                <text-display class="order"></text-display>
+                created at <text-display class="created_at"></text-display>
+              </small>
             </div>
           </order-list>
         </query-my-orders>
@@ -97,7 +125,8 @@
   </div>
   <div style="flex-basis: 300px; display: flex; justify-content: flex-end;">
     <side-panel>
-      <login-form @logged-out="side-panel>query-profile%hidden" @jwt="profile-picture%jwt;query-profile%jwt">
+      <login-form @logged-out="side-panel>query-profile%hidden"
+        @jwt="profile-picture%jwt;query-profile%jwt;query-my-orders%jwt;create-form%jwt">
         <form slot="register" style="border: blue 1px solid; border-radius: 4px;">
           <input type="text" name="username" placeholder="Username" required />
           <input type="email" name="email" placeholder="Email" required />
