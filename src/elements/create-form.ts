@@ -13,12 +13,6 @@ export default class CreateForm extends BaseElement {
             const response = await fetch(`${API}${this.getAttribute('address')}`, {
                 method: 'POST',
                 body: JSON.stringify((await Promise.all(Array.from(data).map(async ([k, v]) => {
-                    // if (typeof v !== 'string') {
-                    //     const reader = new FileReader()
-                    //     reader.readAsDataURL(v)
-                    //     await new Promise(resolve => reader.onload = resolve)
-                    //     return [k, (reader.result as string)]
-                    // }
                     if (typeof v !== 'string') return [k, btoa(new Uint8Array(await v.arrayBuffer()).reduce((p, c) => p.concat(String.fromCodePoint(c)), ''))]
                     try {
                         return [k, JSON.parse(v)]

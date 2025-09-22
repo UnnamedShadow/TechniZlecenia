@@ -98,9 +98,11 @@
                 <br />
                 <text-display></text-display>
               </p>
-              <image-list $src="img%src">
-                <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
-              </image-list>
+              <div>
+                <image-list $src="%src">
+                  <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
+                </image-list>
+              </div>
               <small>
                 <text-display class="order"></text-display>
                 created at <text-display class="created_at"></text-display>

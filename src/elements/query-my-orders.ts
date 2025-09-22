@@ -19,7 +19,7 @@ export default class QueryMyOrders extends BaseElement {
         })
         response.catch((err) => window.alert(err))
         response.then(res => res.json()).then(res => {
-            this.setAttribute('orders', res)
+            this.setAttribute('orders', JSON.stringify(res))
             this.toggleAttribute('loaded', true)
         })
     }

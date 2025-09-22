@@ -19,9 +19,12 @@ export default abstract class TemplateList<T> extends BaseElement {
                 if (mapping === null) return
                 const [path, name] = mapping.split('%')
                 c.forEach(elem => {
-                    elem.querySelectorAll(path).forEach(el => {
-                        el.setAttribute(name, value)
-                    })
+                    if (path === '')
+                        elem.setAttribute(name, value)
+                    else
+                        elem.querySelectorAll(path).forEach(el => {
+                            el.setAttribute(name, value)
+                        })
                 })
             })
         })

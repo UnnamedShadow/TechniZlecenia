@@ -17,7 +17,7 @@ export default class OrderList extends TemplateList<Order> {
             name: `${item.order_name}`,
             description: `${item.order_desc}`,
             price: `${item.price}`,
-            image_urls: `${JSON.stringify(item.image_urls)}`,
+            image_urls: JSON.stringify(item.image_urls),
             created_at: `${item.created_at}`,
         }
     }

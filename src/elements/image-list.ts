@@ -1,10 +1,10 @@
 import TemplateList from "./template-list"
 
-export default class OrderList extends TemplateList<string> {
+export default class ImageList extends TemplateList<string> {
     each(item: string) {
         return {
             src: item,
         }
     }
 }
-customElements.define('order-list', OrderList)
+customElements.define('image-list', ImageList)
