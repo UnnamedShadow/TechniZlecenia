@@ -1,4 +1,5 @@
 import { API } from "../consts"
+import { formToBody } from "../form-utils"
 import { BaseElement, html } from "./base"
 export default class CreateForm extends BaseElement {
     static override observedAttributes = [...super.observedAttributes, 'jwt', 'address'];
@@ -12,15 +13,7 @@ export default class CreateForm extends BaseElement {
             const data = new FormData(form)
             const response = await fetch(`${API}${this.getAttribute('address')}`, {
                 method: 'POST',
-                body: JSON.stringify((await Promise.all(Array.from(data).map(async ([k, v]) => {
-                    if (typeof v !== 'string') return [k, btoa(new Uint8Array(await v.arrayBuffer()).reduce((p, c) => p.concat(String.fromCodePoint(c)), ''))]
-                    try {
-                        return [k, JSON.parse(v)]
-                    } catch {
-                        return [k, v]
-                    }
-                }))).reduce((p: { [key: string]: string | string[] }, [k, v]) =>
-                    k in p ? { ...p, [k]: typeof p[k] === 'string' ? [p[k], v] : [...p[k], v] } : { ...p, [k]: v }, {})),
+                body: JSON.stringify(await formToBody(form)),
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.getAttribute('jwt')}`

@@ -120,6 +120,9 @@
               </user-list>
             </paged-view>
           </query-search>
+          <paged-view>
+
+          </paged-view>
         </div>
         <div slot="offers">
           offers
@@ -136,14 +139,14 @@
           </create-form>
           <query-my-orders @orders="query-my-orders>order-list%data">
             <order-list $name="h3>text-display.name%content" $price="h3 text-display.price%content"
-              $description="p>text-display%content" $order_id="small>text-display.order%content;button%order_id"
-              $created_at="small>text-display.created_at%content" $image_urls="image-list%data">
+              $description="p>text-display%content" $order_id="small>text-display.order%content"
+              $created_at="small>text-display.created_at%content" $image_urls="image-list%data" $datum="button%order">
               <div slot="item">
                 <h3>
                   <text-display class="name"></text-display>
                   <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
                   <button type="button"
-                    onclick="document.querySelector('owned-order-details').setAttribute('current', event.target.getAttribute('order_id'))">
+                    onclick="document.querySelector('owned-order-details').setAttribute('current', event.target.getAttribute('order'))">
                     Details
                   </button>
                 </h3>
@@ -164,15 +167,21 @@
               </div>
             </order-list>
           </query-my-orders>
-          <owned-order-details>
+          <owned-order-details @name="owned-order-details input[type=text]%value"
+            @description="owned-order-details textarea%value" @price="owned-order-details input[type=number]%value">
+            <form>
+              <input type="text" name="order_name" placeholder="Name" required />
+              <textarea name="order_desc" placeholder="Description" required></textarea>
+              <input type="number" name="price" placeholder="Price" min="0" step="0.01" required />
+              <button type="submit">Save</button>
+            </form>
+            <button type="button"
+              onclick="window.prompt('Are you sure? (type \'Yes\')', 'No')==='Yes'&&document.querySelector('owned-order-details').delete()">
+              Delete
+            </button>
             <button type="button" onclick="document.querySelector('owned-order-details').removeAttribute('current')">
               Cancel
             </button>
-            <form>
-              <button type="submit">
-                Save
-              </button>
-            </form>
           </owned-order-details>
         </div>
         <div slot="articles">

@@ -17,7 +17,8 @@ export default abstract class TemplateList<T> extends BaseElement {
     attachCallbacks() {
         const list = JSON.parse(this.getAttribute('data')!) as T[]
         this.elements.forEach((c, i) => {
-            Object.entries(this.each(list[i])).forEach(([attr, value]) => {
+            const result = this.each(list[i])
+            Object.entries({ ...result, datum: JSON.stringify(result) }).forEach(([attr, value]) => {
                 const mapping = this.getAttribute(`$${attr}`)
                 if (mapping === null) return
                 mapping.split(';').forEach(partial => {

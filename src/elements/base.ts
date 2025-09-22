@@ -22,9 +22,11 @@ export abstract class BaseElement extends HTMLElement {
             (this.getRootNode() as Document | ShadowRoot).querySelectorAll(id).forEach(
                 elem => {
                     if (value === null)
-                        elem?.removeAttribute(attr)
+                        elem.removeAttribute(attr)
                     else
-                        elem?.setAttribute(attr, value)
+                        elem.setAttribute(attr, value)
+                    if (attr === 'value' && value)
+                        (elem as HTMLInputElement | HTMLTextAreaElement).value = value
                 })
         })
     }
