@@ -8,6 +8,7 @@
   <title>Vite + TS</title>
   <link rel="stylesheet" href="/src/style.css">
   <script type="module" src="/src/elements/profile-picture.ts"></script>
+  <script type="module" src="/src/elements/template-list.ts"></script>
   <script type="module" src="/src/elements/query-profile.ts"></script>
   <script type="module" src="/src/elements/toggle-button.ts"></script>
   <script type="module" src="/src/elements/text-display.ts"></script>
@@ -15,6 +16,7 @@
   <script type="module" src="/src/elements/tab-button.ts"></script>
   <script type="module" src="/src/elements/paged-view.ts"></script>
   <script type="module" src="/src/elements/login-form.ts"></script>
+  <script type="module" src="/src/elements/order-list.ts"></script>
   <script type="module" src="/src/elements/tab-group.ts"></script>
 </head>
 
@@ -26,7 +28,7 @@
           <tab-button value="browse">Browse</tab-button>
           <tab-button value="search">Search</tab-button>
           <tab-button value="offers">My offers</tab-button>
-          <tab-button value="requests">My requests</tab-button>
+          <tab-button value="orders">My orders</tab-button>
           <br />
           <toggle-button clicked @clicked="nav>tab-group>tab-group%hidden" small>
             <span slot="off">-close</span>
@@ -54,7 +56,15 @@
     <main style="flex-grow: 1; overflow-y: auto;">
       <paged-view>
         <div slot="browse">
-          browsing
+          <h2>A good enough platform for getting things done</h2>
+          <h3>It's a work in progress made in
+            <span style="text-decoration: line-through;">two weeks</span> 2 weekends
+            for a school project
+            @<a href="https://www.technischools.com/">technischools</a>
+          </h3>
+          <div>
+            (Recommendations soon?)
+          </div>
         </div>
         <div slot="search">
           search
@@ -62,11 +72,18 @@
         <div slot="offers">
           offers
         </div>
-        <div slot="requests">
-          requests
-        </div>
+        <query-my-orders slot="orders"> <!--@orders="query-my-orders>order-list%data"-->
+          <order-list $order_name="h3>text-display%content"
+            data='[{"order_id": 1, "user_id": 1, "order_name": "test", "order_desc":"???", "price": 10.2, "image_urls": [], "created_at": "2025-08-22T00:00:00Z"}]'>
+            <div>
+              <h3><text-display></text-display></h3>
+            </div>
+          </order-list>
+        </query-my-orders>
         <div slot="articles">
-          articles
+          <span
+            style="color: transparent; background: linear-gradient(to right, #FFF 50%, rgba(255, 255, 255, 0.1) 100%) text;">Comming
+            soon...</span>
         </div>
       </paged-view>
     </main>
@@ -80,7 +97,7 @@
   </div>
   <div style="flex-basis: 300px; display: flex; justify-content: flex-end;">
     <side-panel>
-      <login-form @logged-out="side-panel>query-profile%hidden" @jwt="profile-picture%jwt">
+      <login-form @logged-out="side-panel>query-profile%hidden" @jwt="profile-picture%jwt;query-profile%jwt">
         <form slot="register" style="border: blue 1px solid; border-radius: 4px;">
           <input type="text" name="username" placeholder="Username" required />
           <input type="email" name="email" placeholder="Email" required />
@@ -115,6 +132,11 @@
         <h4>
           <text-display></text-display>
         </h4>
+        <br />
+        <button
+          onclick="localStorage.removeItem('jwt'); document.querySelector('login-form').toggleAttribute('logged-out', true)">
+          Log out
+        </button>
       </query-profile>
     </side-panel>
   </div>

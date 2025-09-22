@@ -13,15 +13,18 @@ export default class QueryProfile extends BaseElement {
     }
     attachCallbacks() {
         if (this.hasAttribute('loaded') || !this.hasAttribute('jwt')) return
-        fetch(`${API}/user/${this.getAttribute('jwt')!}`, {
+        const { sub }: { sub: number } = JSON.parse(atob(this.getAttribute('jwt')!.split('.')[1]))
+        const response = fetch(`${API}/user/${sub}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => res.json()).then(res => {
+        })
+        response.catch((err) => window.alert(err))
+        response.then(res => res.json()).then(res => {
             this.setAttribute('username', res.username)
             this.setAttribute('email', res.email)
-            this.setAttribute('id', res.id)
+            this.setAttribute('id', sub.toString())
             this.toggleAttribute('loaded', true)
         })
     }

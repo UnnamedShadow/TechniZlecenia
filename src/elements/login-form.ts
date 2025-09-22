@@ -12,6 +12,7 @@ export default class LoginForm extends BaseElement {
         if (!this.hasAttribute('jwt') && !this.hasAttribute('logged-out'))
             this.tryRestoringJWT()
         if (!this.hasAttribute('logged-out')) return
+        this.removeAttribute('jwt')
         const form = this.querySelector(`form[slot="${this.hasAttribute('registering') ? 'register' : 'login'}"]`) as HTMLFormElement | null
         if (!form) return
         const isRegistering = this.hasAttribute('registering')
@@ -34,7 +35,6 @@ export default class LoginForm extends BaseElement {
             } else {
                 const jwt = await response.text()
                 localStorage.setItem('jwt', jwt)
-                this.setAttribute('jwt', jwt)
                 this.toggleAttribute('logged-out', false)
             }
         })
