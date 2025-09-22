@@ -17,14 +17,16 @@ export default abstract class TemplateList<T> extends BaseElement {
             Object.entries(this.each(list[i])).forEach(([attr, value]) => {
                 const mapping = this.getAttribute(`$${attr}`)
                 if (mapping === null) return
-                const [path, name] = mapping.split('%')
-                c.forEach(elem => {
-                    if (path === '')
-                        elem.setAttribute(name, value)
-                    else
-                        elem.querySelectorAll(path).forEach(el => {
-                            el.setAttribute(name, value)
-                        })
+                mapping.split(';').forEach(partial => {
+                    const [path, name] = partial.split('%')
+                    c.forEach(elem => {
+                        if (path === '')
+                            elem.setAttribute(name, value)
+                        else
+                            elem.querySelectorAll(path).forEach(el => {
+                                el.setAttribute(name, value)
+                            })
+                    })
                 })
             })
         })
