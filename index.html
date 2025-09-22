@@ -71,34 +71,36 @@
           </div>
         </div>
         <div slot="search">
-          <order-list $name="h3>text-display.name%content" $price="h3 text-display.price%content"
-            $description="p>text-display%content" $order_id="small>text-display.order%content;button%order_id"
-            $created_at="small>text-display.created_at%content" $image_urls="image-list%data">
-            <div slot="item">
-              <h3>
-                <text-display class="name"></text-display>
-                <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
-                <button type="button"
-                  onclick="document.querySelector('order-details').setAttribute('current', event.target.getAttribute('order_id'))">
-                  Details
-                </button>
-              </h3>
-              <p>
-                Description:
-                <br />
-                <text-display></text-display>
-              </p>
-              <div>
-                <image-list $src="%src">
-                  <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
-                </image-list>
+          <search-form>
+            <order-list slot="orders" $name="h3>text-display.name%content" $price="h3 text-display.price%content"
+              $description="p>text-display%content" $order_id="small>text-display.order%content;button%order_id"
+              $created_at="small>text-display.created_at%content" $image_urls="image-list%data">
+              <div slot="item">
+                <h3>
+                  <text-display class="name"></text-display>
+                  <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
+                  <button type="button"
+                    onclick="document.querySelector('order-details').setAttribute('current', event.target.getAttribute('order_id'))">
+                    Details
+                  </button>
+                </h3>
+                <p>
+                  Description:
+                  <br />
+                  <text-display></text-display>
+                </p>
+                <div>
+                  <image-list $src="%src">
+                    <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
+                  </image-list>
+                </div>
+                <small>
+                  <text-display class="order"></text-display>
+                  created at <text-display class="created_at"></text-display>
+                </small>
               </div>
-              <small>
-                <text-display class="order"></text-display>
-                created at <text-display class="created_at"></text-display>
-              </small>
-            </div>
-          </order-list>
+            </order-list>
+          </search-form>
         </div>
         <div slot="offers">
           offers
