@@ -1,9 +1,27 @@
 import { API } from "../consts"
-import { formToBody } from "../form-utils"
+import { Debouncer, formToBody, handled, invokeUpdates, log } from "../form-utils"
 import { BaseElement, html } from "./base"
-export default class OwnedOrderDetails extends BaseElement {
-    static override observedAttributes = [...super.observedAttributes, 'current', 'jwt', 'name', 'description', 'price'];
 
+type POST = { method: 'POST', id: number, body: string, jwt: string }
+type DELETE = { method: 'DELETE', id: number, jwt: string }
+
+export default class OwnedOrderDetails extends BaseElement {
+    static override observedAttributes = [...super.observedAttributes, 'current', 'jwt', 'name', 'description', 'price', 'toupdate'];
+    private debouncer = new Debouncer<POST | DELETE, { text: string, ok: boolean }>(async (data) => {
+        const res = await handled(fetch(`${API}/orders/${data.id}`, {
+            method: data.method,
+            body: data.method === 'POST' ? data.body : undefined,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + data.jwt,
+            },
+        }), 'network')
+        return { text: await handled(res.text(), 'response'), ok: res.ok }
+    }, ({ text, ok }) => {
+        invokeUpdates(this.getAttribute('toupdate'), this.getRootNode())
+        if (!ok) log(text, 'data')
+        else window.alert('Updated successfully')
+    })
     render() {
         return html`
             <slot ${this.hasAttribute('current') ? '' : 'aria-disabled'}></slot>
@@ -34,31 +52,24 @@ export default class OwnedOrderDetails extends BaseElement {
         const form = this.querySelector('form')!
         form.addEventListener('submit', async (e) => {
             e.preventDefault()
-            const current: { [key: string]: string | string[] } = JSON.parse(this.getAttribute('current')!)
+            const id = JSON.parse(this.getAttribute('current')!).order_id
             this.removeAttribute('current')
-            const res = fetch(`${API}/orders/${current.id}`, {
+            this.debouncer.run({
                 method: 'POST',
+                id,
                 body: JSON.stringify(await formToBody(form)),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + this.getAttribute('jwt'),
-                }
+                jwt: this.getAttribute('jwt')!,
             })
-            res.catch(window.alert)
-            res.then(() => location.reload())
         })
     }
     delete() {
-        this.removeAttribute('current_id')
-        const res = fetch(`${API}/orders/${this.getAttribute('current')}`, {
+        const id = JSON.parse(this.getAttribute('current')!).order_id
+        this.removeAttribute('current')
+        this.debouncer.run({
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + this.getAttribute('jwt'),
-            },
+            id,
+            jwt: this.getAttribute('jwt')!,
         })
-        res.catch(window.alert)
-        res.then(() => location.reload())
     }
 }
 customElements.define('owned-order-details', OwnedOrderDetails)

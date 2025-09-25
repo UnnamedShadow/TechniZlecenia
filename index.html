@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/src/style.css">
   <script type="module" src="/src/elements/owned-order-details.ts"></script>
   <script type="module" src="/src/elements/query-my-orders.ts"></script>
+  <script type="module" src="/src/elements/query-my-offers.ts"></script>
   <script type="module" src="/src/elements/profile-picture.ts"></script>
   <script type="module" src="/src/elements/template-list.ts"></script>
   <script type="module" src="/src/elements/query-profile.ts"></script>
@@ -125,10 +126,12 @@
           </paged-view>
         </div>
         <div slot="offers">
-          offers
+          <query-my-offers>
+
+          </query-my-offers>
         </div>
         <div slot="orders">
-          <create-form address="/order">
+          <create-form address="/order" toupdate="query-my-orders%update">
             <form>
               <input type="text" name="order_name" placeholder="Name" required />
               <textarea name="order_desc" placeholder="Description" required></textarea>
@@ -168,7 +171,8 @@
             </order-list>
           </query-my-orders>
           <owned-order-details @name="owned-order-details input[type=text]%value"
-            @description="owned-order-details textarea%value" @price="owned-order-details input[type=number]%value">
+            @description="owned-order-details textarea%value" @price="owned-order-details input[type=number]%value"
+            toupdate="query-my-orders%update">
             <form>
               <input type="text" name="order_name" placeholder="Name" required />
               <textarea name="order_desc" placeholder="Description" required></textarea>
@@ -203,7 +207,7 @@
   <div style="flex-basis: 300px; display: flex; justify-content: flex-end;">
     <side-panel>
       <login-form @logged-out="side-panel>query-profile%hidden"
-        @jwt="profile-picture%jwt;query-profile%jwt;query-my-orders%jwt;create-form%jwt;query-search%jwt">
+        @jwt="profile-picture%jwt;query-profile%jwt;query-my-orders%jwt;create-form%jwt;query-search%jwt;owned-order-details%jwt;query-my-offers%jwt">
         <form slot="register" style="border: blue 1px solid; border-radius: 4px;">
           <input type="text" name="username" placeholder="Username" required />
           <input type="email" name="email" placeholder="Email" required />

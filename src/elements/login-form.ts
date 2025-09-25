@@ -1,8 +1,31 @@
 import { API } from "../consts"
+import { Debouncer, handled, log } from "../form-utils"
 import { BaseElement, html } from "./base"
 export default class LoginForm extends BaseElement {
     static override observedAttributes = [...super.observedAttributes, 'jwt', 'logged-out', 'registering'];
-
+    private debouncer = new Debouncer<{ isRegistering: boolean, body: string }, { text: string, isRegistering: boolean, ok: boolean }>(
+        async ({ isRegistering, body }) => {
+            const response = await handled(fetch(`${API}/user/${isRegistering ? 'register' : 'login'}`, {
+                method: 'POST',
+                body,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }), 'network')
+            return { text: await handled(response.text(), 'response'), isRegistering, ok: response.ok }
+        }, ({ text, isRegistering, ok }) => {
+            if (!ok) {
+                log(text, 'data')
+                return
+            }
+            if (isRegistering) {
+                this.toggleAttribute('registering', false)
+            } else {
+                localStorage.setItem('jwt', text)
+                this.setAttribute('jwt', text)
+                this.toggleAttribute('logged-out', false)
+            }
+        })
     render() {
         return this.hasAttribute('logged-out') ? html`
             <slot name="${this.hasAttribute('registering') ? 'register' : 'login'}"></slot>
@@ -18,29 +41,12 @@ export default class LoginForm extends BaseElement {
         const isRegistering = this.hasAttribute('registering')
         form.addEventListener('submit', async (e) => {
             e.preventDefault()
-            const data = new FormData(form)
-            const response = await fetch(`${API}/user/${isRegistering ? 'register' : 'login'}`, {
-                method: 'POST',
-                body: JSON.stringify(Object.fromEntries(data.entries())),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            if (!response.ok) {
-                alert(await response.text())
-                return
-            }
-            if (isRegistering) {
-                this.toggleAttribute('registering', false)
-            } else {
-                const jwt = await response.text()
-                localStorage.setItem('jwt', jwt)
-                this.toggleAttribute('logged-out', false)
-            }
+            const body = JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+            this.debouncer.run({ isRegistering, body })
         })
     }
 
-    tryRestoringJWT() {
+    private tryRestoringJWT() {
         const jwt = localStorage.getItem('jwt')
         if (jwt === null) this.toggleAttribute('logged-out', true)
         else {

@@ -1,10 +1,10 @@
 import { API } from "../consts"
 import { Debouncer, handled, log } from "../form-utils"
 import { BaseElement, html } from "./base"
-export default class QueryMyOrders extends BaseElement {
-    static override observedAttributes = [...super.observedAttributes, 'jwt', 'orders', 'loaded'];
+export default class QueryMyOffers extends BaseElement {
+    static override observedAttributes = [...super.observedAttributes, 'jwt', 'offers', 'loaded']
     private debouncer = new Debouncer<{ sub: number }, { ok: boolean, text: string }>(async ({ sub }) => {
-        const response = await handled(fetch(`${API}/orders/user/${sub}`, {
+        const response = await handled(fetch(`${API}/offers/user/${sub}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -15,20 +15,21 @@ export default class QueryMyOrders extends BaseElement {
         if (!ok) {
             log(text, 'data')
         } else {
-            this.setAttribute('orders', text)
+            this.setAttribute('offers', text)
             this.toggleAttribute('loaded', true)
         }
     })
     render() {
-        if (!this.hasAttribute('orders'))
-            return html`Loading...`
-        if (!this.hasAttribute('loaded'))
-            return html`<slot></slot><style>
+        if (!this.hasAttribute('offers')) return html`Loading...`
+        if (this.hasAttribute('loaded')) return html`<slot></slot>`
+        return html`
+            <slot></slot>
+            <style>
                 :host {
                     cursor: wait;
                 }
-            </style>`
-        return html`<slot></slot>`
+            </style>
+        `
     }
     attachCallbacks() {
         if (this.hasAttribute('loaded') || !this.hasAttribute('jwt')) return
@@ -39,4 +40,5 @@ export default class QueryMyOrders extends BaseElement {
         this.toggleAttribute('loaded', false)
     }
 }
-customElements.define('query-my-orders', QueryMyOrders)
+
+customElements.define('query-my-offers', QueryMyOffers)

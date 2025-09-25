@@ -1,6 +1,6 @@
 import TemplateList from "./template-list"
 
-type Order = {
+export type Order = {
     order_id: number
     user_id: number,
     order_name: string,
