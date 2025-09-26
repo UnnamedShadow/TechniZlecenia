@@ -1,26 +1,19 @@
 import { BaseElement, html } from "./base"
 export default class RouterView extends BaseElement {
-    static override observedAttributes = [...super.observedAttributes, 'route', 'data', 'json', 'origin'];
+    static override observedAttributes = [...super.observedAttributes, 'route', 'json', 'origin'];
 
     render() {
-        return html`
-            <slot></slot>
-            <slot name="${this.getAttribute('route')!}"></slot>
-        `
-    }
-    attachCallbacks() {
         const origin = `${this.getAttribute('origin')!}/`
-        const json = JSON.stringify(
-            this.getAttribute('route')!
-                .split('/')
-                .slice(1, -1)
-                .reduce((p, c) => [...p, { href: (p.at(-1)?.href || '') + c + '/', text: c + '/' }], [{ href: origin, text: origin }])
-        )
+        const route: { name: string, data: string }[] = JSON.parse(this.getAttribute('route')!)
+        const json = JSON.stringify(route.reduce(
+            (p, { name }, i) =>
+                [...p, { href: p.at(-1)!.href + name + '/', text: name + '/', i: i + 1 }],
+            [{ href: origin, text: origin, i: 0 }]
+        ))
         if (this.getAttribute('json') !== json) this.setAttribute('json', json)
-        const raw_data = this.getAttribute('data')
-        if (!raw_data) return
-        const data = JSON.parse(raw_data)
-        this.querySelectorAll(`[slot="${this.getAttribute('route')}"]`).forEach(slot => {
+        const data = route.at(-1)?.data
+        const current_path = '/' + route.map(({ name }) => name).join('/')
+        if (data) this.querySelectorAll(`[slot="${current_path}"]`).forEach(slot => {
             Object.entries(data).forEach(([key, value]) => {
                 this.getAttribute(`$${key}`)?.split(';').forEach(partial => {
                     const [path, name] = partial.split('%')
@@ -30,14 +23,24 @@ export default class RouterView extends BaseElement {
                 })
             })
         })
+        return html`
+            <slot></slot>
+            <slot name="${current_path}"></slot>
+        `
     }
-    setLocation(route: string, data: string) {
-        this.setAttribute('route', route)
-        this.setAttribute('data', data)
+    attachCallbacks() { }
+    prev() {
+        const route: { name: string, data: string }[] = JSON.parse(this.getAttribute('route')!)
+        this.setAttribute('route', JSON.stringify(route.slice(0, -1)))
     }
-    addLocation(route: string, data: string) {
-        this.setAttribute('route', this.getAttribute('route')! + route)
-        this.setAttribute('data', data)
+    next(name: string, data: string) {
+        const route: { name: string, data: string }[] = JSON.parse(this.getAttribute('route')!)
+        this.setAttribute('route', JSON.stringify([...route, { name, data }]))
+    }
+    to(count: number) {
+        console.log(count)
+        const route: { name: string, data: string }[] = JSON.parse(this.getAttribute('route')!)
+        this.setAttribute('route', JSON.stringify(route.slice(0, count)))
     }
 }
 customElements.define('router-view', RouterView)

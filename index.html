@@ -136,11 +136,12 @@
               </div>
             </offer-list>
         </div>
-        <router-view slot="orders" route="/" @json="route-list%data" origin="My orders">
+        <router-view slot="orders" route="[]" @json="route-list%data" origin="My orders">
           <div style="display: flex; flex-direction: row;">
-            <route-list $href="a%href" $text="a>text-display%content" style="display: flex; flex-direction: row;">
+            <route-list $href="a%href" $text="a>text-display%content" $i="a%i"
+              style="display: flex; flex-direction: row;">
               <div slot="item">
-                <a onclick="event.preventDefault();document.querySelector('router-view[slot=orders]').setAttribute('path', event.target.getAttribute('href'))"
+                <a onclick="event.preventDefault();document.querySelector('router-view[slot=orders]').to(JSON.parse(this.getAttribute('i')))"
                   style="color: gray;">
                   <text-display></text-display>
                 </a>
@@ -167,7 +168,7 @@
                     <text-display class="name"></text-display>
                     <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
                     <button type="button"
-                      onclick="document.querySelector('router-view[slot=orders]').addLocation('details/', event.target.getAttribute('order'))">
+                      onclick="document.querySelector('router-view[slot=orders]').next('details', event.target.getAttribute('order'))">
                       Details
                     </button>
                   </h3>
