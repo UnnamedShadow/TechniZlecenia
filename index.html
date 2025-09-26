@@ -17,6 +17,7 @@
   <script type="module" src="/src/elements/text-display.ts"></script>
   <script type="module" src="/src/elements/query-search.ts"></script>
   <script type="module" src="/src/elements/create-form.ts"></script>
+  <script type="module" src="/src/elements/router-view.ts"></script>
   <script type="module" src="/src/elements/side-panel.ts"></script>
   <script type="module" src="/src/elements/tab-button.ts"></script>
   <script type="module" src="/src/elements/paged-view.ts"></script>
@@ -24,6 +25,7 @@
   <script type="module" src="/src/elements/order-list.ts"></script>
   <script type="module" src="/src/elements/image-list.ts"></script>
   <script type="module" src="/src/elements/offer-list.ts"></script>
+  <script type="module" src="/src/elements/route-list.ts"></script>
   <script type="module" src="/src/elements/tab-group.ts"></script>
   <script type="module" src="/src/elements/user-list.ts"></script>
 </head>
@@ -67,8 +69,8 @@
           <h2>A good enough platform for getting things done</h2>
           <h3>It's a work in progress made in
             <div>
-              <span style="text-decoration: line-through;">two weeks</span>
-              2 weekends + 1 week of sick leave
+              <span style="text-decoration: line-through;">three weeks</span>
+              3 weekends + 4 days of sick leave
             </div>
             for a school project
             @<a href="https://www.technischools.com/">technischools</a>
@@ -134,65 +136,77 @@
               </div>
             </offer-list>
         </div>
-        <div slot="orders">
-          <create-form address="/order" toupdate="query-my-orders%update" start='{"images": []}'>
-            <form>
-              <input type="text" name="order_name" placeholder="Name" required />
-              <textarea name="order_desc" placeholder="Description" required></textarea>
-              <input type="number" name="price" placeholder="Price" min="0" step="0.01" required />
-              <input type="file" name="images" multiple />
-              <button type="button" onclick="event.target.previousElementSibling.value = ''">Clear images</button>
-              <button type="submit">Create</button>
-            </form>
-          </create-form>
-          <query-my-orders @orders="query-my-orders>order-list%data">
-            <order-list $name="h3>text-display.name%content" $price="h3 text-display.price%content"
-              $description="p>text-display%content" $order_id="small>text-display.order%content"
-              $created_at="small>text-display.created_at%content" $image_urls="image-list%data" $datum="button%order">
+        <router-view slot="orders" route="/" @json="router-view[slot=orders] route-list%data" origin="My orders">
+          <div style="display: flex; flex-direction: row;">
+            <route-list $href="a%href" $text="a>text-display%content">
               <div slot="item">
-                <h3>
-                  <text-display class="name"></text-display>
-                  <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
-                  <button type="button"
-                    onclick="document.querySelector('owned-order-details').setAttribute('current', event.target.getAttribute('order'))">
-                    Details
-                  </button>
-                </h3>
-                <p>
-                  Description:
-                  <br />
+                <a onclick="event.preventDefault();document.querySelector('router-view[slot=orders]').setAttribute('path', event.target.getAttribute('href'))"
+                  style="color: gray;">
                   <text-display></text-display>
-                </p>
-                <div>
-                  <image-list $src="%src">
-                    <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
-                  </image-list>
-                </div>
-                <small>
-                  <text-display class="order"></text-display>
-                  created at <text-display class="created_at"></text-display>
-                </small>
+                </a>
               </div>
-            </order-list>
-          </query-my-orders>
-          <owned-order-details @name="owned-order-details input[type=text]%value"
-            @description="owned-order-details textarea%value" @price="owned-order-details input[type=number]%value"
-            toupdate="query-my-orders%update">
-            <form>
-              <input type="text" name="order_name" placeholder="Name" required />
-              <textarea name="order_desc" placeholder="Description" required></textarea>
-              <input type="number" name="price" placeholder="Price" min="0" step="0.01" required />
-              <button type="submit">Save</button>
-            </form>
-            <button type="button"
-              onclick="window.prompt('Are you sure? (type \'Yes\')', 'No')==='Yes'&&document.querySelector('owned-order-details').delete()">
-              Delete
-            </button>
-            <button type="button" onclick="document.querySelector('owned-order-details').removeAttribute('current')">
-              Cancel
-            </button>
-          </owned-order-details>
-        </div>
+            </route-list>
+          </div>
+          <div slot="/">
+            <create-form address="/order" toupdate="query-my-orders%update" start='{"images": []}'>
+              <form>
+                <input type="text" name="order_name" placeholder="Name" required />
+                <textarea name="order_desc" placeholder="Description" required></textarea>
+                <input type="number" name="price" placeholder="Price" min="0" step="0.01" required />
+                <input type="file" name="images" multiple />
+                <button type="button" onclick="event.target.previousElementSibling.value = ''">Clear images</button>
+                <button type="submit">Create</button>
+              </form>
+            </create-form>
+            <query-my-orders @orders="query-my-orders>order-list%data">
+              <order-list $name="h3>text-display.name%content" $price="h3 text-display.price%content"
+                $description="p>text-display%content" $order_id="small>text-display.order%content"
+                $created_at="small>text-display.created_at%content" $image_urls="image-list%data" $datum="button%order">
+                <div slot="item">
+                  <h3>
+                    <text-display class="name"></text-display>
+                    <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
+                    <button type="button"
+                      onclick="document.querySelector('owned-order-details').setAttribute('current', event.target.getAttribute('order'))">
+                      Details
+                    </button>
+                  </h3>
+                  <p>
+                    Description:
+                    <br />
+                    <text-display></text-display>
+                  </p>
+                  <div>
+                    <image-list $src="%src">
+                      <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
+                    </image-list>
+                  </div>
+                  <small>
+                    <text-display class="order"></text-display>
+                    created at <text-display class="created_at"></text-display>
+                  </small>
+                </div>
+              </order-list>
+            </query-my-orders>
+            <owned-order-details @name="owned-order-details input[type=text]%value"
+              @description="owned-order-details textarea%value" @price="owned-order-details input[type=number]%value"
+              toupdate="query-my-orders%update">
+              <form>
+                <input type="text" name="order_name" placeholder="Name" required />
+                <textarea name="order_desc" placeholder="Description" required></textarea>
+                <input type="number" name="price" placeholder="Price" min="0" step="0.01" required />
+                <button type="submit">Save</button>
+              </form>
+              <button type="button"
+                onclick="window.prompt('Are you sure? (type \'Yes\')', 'No')==='Yes'&&document.querySelector('owned-order-details').delete()">
+                Delete
+              </button>
+              <button type="button" onclick="document.querySelector('owned-order-details').removeAttribute('current')">
+                Cancel
+              </button>
+            </owned-order-details>
+          </div>
+        </router-view>
         <div slot="articles">
           <span
             style="color: transparent; background: linear-gradient(to right, #FFF 50%, rgba(255, 255, 255, 0.1) 100%) text;">
