@@ -5,3 +5,4 @@ export const howShouldLog: { [key: string]: string | null } = {
     'response': 'Server sent invalid response (website may be down)',
     'data': 'Provided data was propably invalid(try inputting it again or relogging)',
 }
+export const memoizeAnything = true

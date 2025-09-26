@@ -59,7 +59,7 @@ export default class OwnedOrderDetails extends BaseElement {
                 id,
                 body: JSON.stringify(await formToBody(form)),
                 jwt: this.getAttribute('jwt')!,
-            })
+            }, { delay_before: 100, delay_after: 200 })
         })
     }
     delete() {
@@ -69,7 +69,7 @@ export default class OwnedOrderDetails extends BaseElement {
             method: 'DELETE',
             id,
             jwt: this.getAttribute('jwt')!,
-        })
+        }, { delay_after: 200 })
     }
 }
 customElements.define('owned-order-details', OwnedOrderDetails)

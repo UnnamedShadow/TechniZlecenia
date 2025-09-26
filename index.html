@@ -23,6 +23,7 @@
   <script type="module" src="/src/elements/login-form.ts"></script>
   <script type="module" src="/src/elements/order-list.ts"></script>
   <script type="module" src="/src/elements/image-list.ts"></script>
+  <script type="module" src="/src/elements/offer-list.ts"></script>
   <script type="module" src="/src/elements/tab-group.ts"></script>
   <script type="module" src="/src/elements/user-list.ts"></script>
 </head>
@@ -65,7 +66,10 @@
         <div slot="browse">
           <h2>A good enough platform for getting things done</h2>
           <h3>It's a work in progress made in
-            <span style="text-decoration: line-through;">two weeks</span> 2 weekends
+            <div>
+              <span style="text-decoration: line-through;">two weeks</span>
+              2 weekends + 1 week of sick leave
+            </div>
             for a school project
             @<a href="https://www.technischools.com/">technischools</a>
           </h3>
@@ -121,22 +125,23 @@
               </user-list>
             </paged-view>
           </query-search>
-          <paged-view>
-
-          </paged-view>
         </div>
         <div slot="offers">
-          <query-my-offers>
-
-          </query-my-offers>
+          <query-my-offers @offers="query-my-offers>offer-list%data">
+            <offer-list>
+              <div slot="item">
+                test
+              </div>
+            </offer-list>
         </div>
         <div slot="orders">
-          <create-form address="/order" toupdate="query-my-orders%update">
+          <create-form address="/order" toupdate="query-my-orders%update" start='{"images": []}'>
             <form>
               <input type="text" name="order_name" placeholder="Name" required />
               <textarea name="order_desc" placeholder="Description" required></textarea>
               <input type="number" name="price" placeholder="Price" min="0" step="0.01" required />
               <input type="file" name="images" multiple />
+              <button type="button" onclick="event.target.previousElementSibling.value = ''">Clear images</button>
               <button type="submit">Create</button>
             </form>
           </create-form>

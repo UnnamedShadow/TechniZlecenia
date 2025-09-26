@@ -3,7 +3,7 @@ import { Debouncer, formToBody, handled, invokeUpdates, log } from "../form-util
 import { BaseElement, html } from "./base"
 type CreateParams = { data: { [key: string]: string | string[] }, address: string, jwt: string }
 export default class CreateForm extends BaseElement {
-    static override observedAttributes = [...super.observedAttributes, 'jwt', 'address', 'toupdate'];
+    static override observedAttributes = [...super.observedAttributes, 'jwt', 'address', 'toupdate', 'start'];
     private debouncer = new Debouncer<CreateParams, { ok: boolean, statusText: string }>(
         async ({ data, address, jwt }) => {
             const res = await handled(fetch(`${API}${address}`, {
@@ -29,10 +29,10 @@ export default class CreateForm extends BaseElement {
         const form = this.querySelector('form')!
         form.addEventListener('submit', async e => {
             e.preventDefault(); this.debouncer.run({
-                data: await formToBody(form),
+                data: await formToBody(form, JSON.parse(this.getAttribute('start') || '{}')),
                 address: this.getAttribute('address')!,
                 jwt: this.getAttribute('jwt')!,
-            })
+            }, { delay_before: 100, delay_after: 400 })
         })
     }
 }

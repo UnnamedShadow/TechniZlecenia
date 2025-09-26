@@ -34,7 +34,7 @@ export default class QueryMyOffers extends BaseElement {
     attachCallbacks() {
         if (this.hasAttribute('loaded') || !this.hasAttribute('jwt')) return
         const { sub }: { sub: number } = JSON.parse(atob(this.getAttribute('jwt')!.split('.')[1]))
-        this.debouncer.run({ sub })
+        this.debouncer.run({ sub }, { delay_after: 400, memoize: true })
     }
     update() {
         this.toggleAttribute('loaded', false)

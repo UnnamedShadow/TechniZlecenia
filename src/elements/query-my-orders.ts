@@ -23,17 +23,27 @@ export default class QueryMyOrders extends BaseElement {
         if (!this.hasAttribute('orders'))
             return html`Loading...`
         if (!this.hasAttribute('loaded'))
-            return html`<slot></slot><style>
+            return html`
+                <slot></slot>
+                <style>
+                    :host {
+                        cursor: wait;
+                    }
+                </style>
+            `
+        return html`
+            <slot></slot>
+            <style>
                 :host {
-                    cursor: wait;
+                    cursor: default;
                 }
-            </style>`
-        return html`<slot></slot>`
+            </style>
+        `
     }
     attachCallbacks() {
         if (this.hasAttribute('loaded') || !this.hasAttribute('jwt')) return
         const { sub }: { sub: number } = JSON.parse(atob(this.getAttribute('jwt')!.split('.')[1]))
-        this.debouncer.run({ sub })
+        this.debouncer.run({ sub }, { delay_after: 500, memoize: true })
     }
     update() {
         this.toggleAttribute('loaded', false)

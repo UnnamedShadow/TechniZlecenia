@@ -33,14 +33,7 @@ export default class QueryProfile extends BaseElement {
     attachCallbacks() {
         if (this.hasAttribute('loaded') || !this.hasAttribute('jwt')) return
         const { sub }: { sub: number } = JSON.parse(atob(this.getAttribute('jwt')!.split('.')[1]))
-        this.debouncer.run({ sub })
-        // response.catch((err) => window.alert(err))
-        // response.then(res => res.json()).then(res => {
-        //     this.setAttribute('username', res.username)
-        //     this.setAttribute('email', res.email)
-        //     this.setAttribute('id', sub.toString())
-        //     this.toggleAttribute('loaded', true)
-        // })
+        this.debouncer.run({ sub }, { delay_before: 50, delay_after: 500, memoize: true })
     }
     update() {
         this.toggleAttribute('loaded', false)
