@@ -3,7 +3,8 @@ import TemplateList from "./template-list"
 export default class ImageList extends TemplateList<string> {
     each(item: string) {
         return {
-            src: item,
+            data: { src: item },
+            key: item,
         }
     }
 }

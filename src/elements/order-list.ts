@@ -12,13 +12,15 @@ export type Order = {
 export default class OrderList extends TemplateList<Order> {
     each(item: Order) {
         return {
-            order_id: `${item.order_id}`,
-            user_id: `${item.user_id}`,
-            name: `${item.order_name}`,
-            description: `${item.order_desc}`,
-            price: `${item.price}`,
-            image_urls: JSON.stringify(item.image_urls),
-            created_at: `${item.created_at}`,
+            data: {
+                order_id: `${item.order_id}`,
+                user_id: `${item.user_id}`,
+                name: `${item.order_name}`,
+                description: `${item.order_desc}`,
+                price: `${item.price}`,
+                image_urls: JSON.stringify(item.image_urls),
+                created_at: `${item.created_at}`,
+            }, key: item.order_id.toString()
         }
     }
 }

@@ -10,11 +10,13 @@ export type Offer = {
 export default class OfferList extends TemplateList<Offer> {
     each(item: Offer) {
         return {
-            offer_id: item.offer_id.toString(),
-            order_id: item.order_id.toString(),
-            user_id: item.user_id.toString(),
-            status: item.status,
-            created_at: item.created_at.toString(),
+            data: {
+                offer_id: item.offer_id.toString(),
+                order_id: item.order_id.toString(),
+                user_id: item.user_id.toString(),
+                status: item.status,
+                created_at: item.created_at.toString(),
+            }, key: item.offer_id.toString()
         }
     }
 }

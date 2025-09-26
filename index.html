@@ -136,9 +136,9 @@
               </div>
             </offer-list>
         </div>
-        <router-view slot="orders" route="/" @json="router-view[slot=orders] route-list%data" origin="My orders">
+        <router-view slot="orders" route="/" @json="route-list%data" origin="My orders">
           <div style="display: flex; flex-direction: row;">
-            <route-list $href="a%href" $text="a>text-display%content">
+            <route-list $href="a%href" $text="a>text-display%content" style="display: flex; flex-direction: row;">
               <div slot="item">
                 <a onclick="event.preventDefault();document.querySelector('router-view[slot=orders]').setAttribute('path', event.target.getAttribute('href'))"
                   style="color: gray;">
@@ -167,7 +167,7 @@
                     <text-display class="name"></text-display>
                     <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
                     <button type="button"
-                      onclick="document.querySelector('owned-order-details').setAttribute('current', event.target.getAttribute('order'))">
+                      onclick="document.querySelector('router-view[slot=orders]').addLocation('details/', event.target.getAttribute('order'))">
                       Details
                     </button>
                   </h3>
@@ -188,24 +188,24 @@
                 </div>
               </order-list>
             </query-my-orders>
-            <owned-order-details @name="owned-order-details input[type=text]%value"
-              @description="owned-order-details textarea%value" @price="owned-order-details input[type=number]%value"
-              toupdate="query-my-orders%update">
-              <form>
-                <input type="text" name="order_name" placeholder="Name" required />
-                <textarea name="order_desc" placeholder="Description" required></textarea>
-                <input type="number" name="price" placeholder="Price" min="0" step="0.01" required />
-                <button type="submit">Save</button>
-              </form>
-              <button type="button"
-                onclick="window.prompt('Are you sure? (type \'Yes\')', 'No')==='Yes'&&document.querySelector('owned-order-details').delete()">
-                Delete
-              </button>
-              <button type="button" onclick="document.querySelector('owned-order-details').removeAttribute('current')">
-                Cancel
-              </button>
-            </owned-order-details>
           </div>
+          <owned-order-details slot="/details/" @name="owned-order-details input[type=text]%value"
+            @description="owned-order-details textarea%value" @price="owned-order-details input[type=number]%value"
+            toupdate="query-my-orders%update">
+            <form>
+              <input type="text" name="order_name" placeholder="Name" required />
+              <textarea name="order_desc" placeholder="Description" required></textarea>
+              <input type="number" name="price" placeholder="Price" min="0" step="0.01" required />
+              <button type="submit">Save</button>
+            </form>
+            <button type="button"
+              onclick="window.prompt('Are you sure? (type \'Yes\')', 'No')==='Yes'&&document.querySelector('owned-order-details').delete()">
+              Delete
+            </button>
+            <button type="button" onclick="document.querySelector('owned-order-details').removeAttribute('current')">
+              Cancel
+            </button>
+          </owned-order-details>
         </router-view>
         <div slot="articles">
           <span

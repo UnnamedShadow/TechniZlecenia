@@ -10,10 +10,12 @@ type User = {
 export default class UserList extends TemplateList<User> {
     each(item: User) {
         return {
-            'id': item.user_id.toString(),
-            'name': item.username,
-            'email': item.email,
-            'created_at': item.created_at.toString(),
+            data: {
+                'id': item.user_id.toString(),
+                'name': item.username,
+                'email': item.email,
+                'created_at': item.created_at.toString(),
+            }, key: item.user_id.toString()
         }
     }
 }
