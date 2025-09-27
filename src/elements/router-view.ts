@@ -1,46 +1,59 @@
 import { BaseElement, html } from "./base"
+type Fragment = { name: string, data: { [key: string]: unknown }, type: string }
 export default class RouterView extends BaseElement {
     static override observedAttributes = [...super.observedAttributes, 'route', 'json', 'origin'];
-
+    private elements: { [href: string]: HTMLElement[] } = {}
     render() {
-        const origin = `${this.getAttribute('origin')!}/`
-        const route: { name: string, data: string }[] = JSON.parse(this.getAttribute('route')!)
-        const json = JSON.stringify(route.reduce(
-            (p, { name }, i) =>
-                [...p, { href: p.at(-1)!.href + name + '/', text: name + '/', i: i + 1 }],
-            [{ href: origin, text: origin, i: 0 }]
-        ))
+        const fragments: { data: Fragment, href: string }[] = (JSON.parse(this.getAttribute('route')!) as Fragment[]).reduce(
+            (p, c) => [...p, { data: c, href: p.at(-1)!.href + c.name + '/' }],
+            [{ href: '/', data: JSON.parse(this.getAttribute('origin')!) }]
+        )
+        const json = JSON.stringify(fragments.map(({ href, data: { name } }, i) => ({ href, text: name, i })))
         if (this.getAttribute('json') !== json) this.setAttribute('json', json)
-        const data = route.at(-1)?.data
-        const current_slot = route.at(-1)?.name || '/'
-        if (data) this.querySelectorAll(`[slot="${current_slot}"]`).forEach(slot => {
-            Object.entries(data).forEach(([key, value]) => {
-                this.getAttribute(`$${key}`)?.split(';').forEach(partial => {
-                    const [path, name] = partial.split('%')
-                    slot.querySelectorAll(path).forEach(el => {
-                        el.setAttribute(name, JSON.stringify(value))
-                    })
+        Object.keys(this.elements).forEach(href => {
+            if (href in fragments.map(f => f.href)) return
+            this.elements[href].forEach(el => el.remove())
+            delete this.elements[href]
+        })
+        const current = fragments.at(-1)!
+        if (!(current.href in this.elements)) {
+            this.elements[current.href] = Array.from(this.children).filter(c => c.getAttribute('slot') === current.data.type).map(c => c.cloneNode(true) as HTMLElement)
+        }
+        Object.entries(current.data).forEach(([k, v]) => {
+            const mapping = this.getAttribute(`$${k}`)
+            if (!mapping) return
+            const stringified = JSON.stringify(v)
+            mapping.split(';').forEach(partial => {
+                const [path, name] = partial.split('%')
+                this.elements[current.href].forEach(el => {
+                    (path ? el.querySelectorAll(path) : [el]).forEach(
+                        item => {
+                            const current = item.getAttribute(name)
+                            if (current !== stringified)
+                                item.setAttribute(name, stringified)
+                        }
+                    )
                 })
             })
         })
         return html`
             <slot></slot>
-            <slot name="${current_slot}"></slot>
+            <slot name="${current.href}"></slot>
         `
     }
     attachCallbacks() { }
     prev() {
-        const route: { name: string, data: string }[] = JSON.parse(this.getAttribute('route')!)
-        this.setAttribute('route', JSON.stringify(route.slice(0, -1)))
+        const routes: Fragment[] = JSON.parse(this.getAttribute('route')!)
+        this.setAttribute('route', JSON.stringify(routes.slice(0, -1)))
     }
-    next(name: string, data: string) {
-        const route: { name: string, data: string }[] = JSON.parse(this.getAttribute('route')!)
-        this.setAttribute('route', JSON.stringify([...route, { name, data }]))
+    next(route: Fragment) {
+        const routes: Fragment[] = JSON.parse(this.getAttribute('route')!)
+        this.setAttribute('route', JSON.stringify([...routes, route]))
     }
     to(count: number) {
         console.log(count)
-        const route: { name: string, data: string }[] = JSON.parse(this.getAttribute('route')!)
-        this.setAttribute('route', JSON.stringify(route.slice(0, count)))
+        const routes: Fragment[] = JSON.parse(this.getAttribute('route')!)
+        this.setAttribute('route', JSON.stringify(routes.slice(0, count)))
     }
 }
 customElements.define('router-view', RouterView)

@@ -65,7 +65,8 @@
     </header>
     <main style="flex-grow: 1; overflow-y: auto;">
       <paged-view>
-        <router-view slot="browse" route="[]" origin="Home" @json="route-list%data">
+        <router-view slot="browse" route="[]" origin='{"name": "Home/", "data":{}, "type": "home"}'
+          @json="route-list%data">
           <div style="display: flex; flex-direction: row;">
             <route-list $href="a%href" $text="a>text-display%content" $i="a%i"
               style="display: flex; flex-direction: row;">
