@@ -4,11 +4,10 @@ export default class PagedView extends BaseElement {
 
     render() {
         return html`
-            <slot name="${this.getAttribute(`page`) || `0`}"></slot>
+            <slot></slot>
+            <slot name="${this.getAttribute(`page`) || '0'}"></slot>
         `
     }
-    attachCallbacks() {
-
-    }
+    attachCallbacks() { }
 }
 customElements.define('paged-view', PagedView)

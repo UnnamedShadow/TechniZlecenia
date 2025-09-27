@@ -6,8 +6,10 @@ export default abstract class TemplateList<T> extends BaseElement {
         const current_keys = Object.keys(this.elements)
         const list = (JSON.parse(this.getAttribute('data')!) as T[]).map(this.each)
         current_keys.forEach(key => {
-            if (!(key in list)) {
-                this.elements[key].forEach(el => el.remove())
+            if (!(key in list.map(l => l.key))) {
+                this.elements[key].forEach(el => {
+                    el.remove()
+                })
                 delete this.elements[key]
             }
         })

@@ -8,12 +8,15 @@
   <title>Vite + TS</title>
   <link rel="stylesheet" href="/src/style.css">
   <script type="module" src="/src/elements/owned-order-details.ts"></script>
+  <script type="module" src="/src/elements/bookmark-provider.ts"></script>
   <script type="module" src="/src/elements/query-my-orders.ts"></script>
   <script type="module" src="/src/elements/query-my-offers.ts"></script>
   <script type="module" src="/src/elements/profile-picture.ts"></script>
+  <script type="module" src="/src/elements/if-equal-view.ts"></script>
   <script type="module" src="/src/elements/template-list.ts"></script>
   <script type="module" src="/src/elements/query-profile.ts"></script>
   <script type="module" src="/src/elements/toggle-button.ts"></script>
+  <script type="module" src="/src/elements/bookmark-list.ts"></script>
   <script type="module" src="/src/elements/text-display.ts"></script>
   <script type="module" src="/src/elements/query-search.ts"></script>
   <script type="module" src="/src/elements/create-form.ts"></script>
@@ -28,23 +31,39 @@
   <script type="module" src="/src/elements/route-list.ts"></script>
   <script type="module" src="/src/elements/tab-group.ts"></script>
   <script type="module" src="/src/elements/user-list.ts"></script>
+  <script type="module" src="/src/elements/tab-list.ts"></script>
 </head>
 
 <body style="overflow: hidden;">
   <div style="flex-basis: 300px;">
     <side-panel>
       <nav style="height: 100%; display: flex; flex-direction: column; padding: 10px">
-        <tab-group value="browse" @value="main>paged-view%page">
+        <tab-group value="about" @value="main>paged-view%page">
+          <tab-button value="about">About</tab-button>
           <tab-button value="browse">Browse</tab-button>
-          <tab-button value="search">Search</tab-button>
           <tab-button value="offers">My offers</tab-button>
           <tab-button value="orders">My orders</tab-button>
           <br />
-          <toggle-button clicked @clicked="nav>tab-group>tab-group%hidden" small>
+          <tab-group class="bookmarks">
+            <span>Bookmarks:</span>
+            <bookmark-provider @tabs="tab-list%data" base='[{"tab": "browse", "content": []}]'
+              @data="bookmark-list%data">
+              <tab-list $value="tab-button%value" $text="text-display%content">
+                <div slot="item">
+                  <tab-button>
+                    <text-display></text-display>
+                  </tab-button>
+                </div>
+              </tab-list>
+            </bookmark-provider>
+          </tab-group>
+          <br />
+          <div style="min-height: 1rem;"></div>
+          <toggle-button clicked @clicked="tab-group.more%hidden" small>
             <span slot="off">-close</span>
             <span slot="on">more...</span>
           </toggle-button>
-          <tab-group disabled>
+          <tab-group class="more">
             <tab-button value="articles">Articles</tab-button>
           </tab-group>
         </tab-group>
@@ -64,84 +83,101 @@
       </toggle-button>
     </header>
     <main style="flex-grow: 1; overflow-y: auto;">
-      <paged-view>
-        <router-view slot="browse" route="[]" origin='{"name": "Home/", "data":{}, "type": "home"}'
-          @json="route-list%data">
-          <div style="display: flex; flex-direction: row;">
-            <route-list $href="a%href" $text="a>text-display%content" $i="a%i"
-              style="display: flex; flex-direction: row;">
-              <div slot="item">
-                <a onclick="event.preventDefault();document.querySelector('router-view[slot=orders]').to(JSON.parse(this.getAttribute('i')))"
-                  style="color: gray;">
-                  <text-display></text-display>
-                </a>
-              </div>
-            </route-list>
-          </div>
-          <div slot="/">
-            <h2>A good enough platform for getting things done</h2>
-            <h3>It's a work in progress made in
-              <div>
-                <span style="text-decoration: line-through;">three weeks</span>
-                3 weekends + 4 days of sick leave
-              </div>
-              for a school project
-              @<a href="https://www.technischools.com/">technischools</a>
-            </h3>
+      <paged-view @page="bookmark-list>div>if-equal-view%a">
+        <div slot="about">
+          <h2>A good enough platform for getting things done</h2>
+          <h3>It's a work in progress made in
             <div>
-              (Recommendations soon?)
+              <span style="text-decoration: line-through;">three weeks</span>
+              3 weekends + 4 days of sick leave
             </div>
-          </div>
-        </router-view>
-        <div slot="search">
-          <toggle-button @clicked="query-search%is_user">
-            <span slot="off">searching orders</span>
-            <span slot="on">searching users</span>
-          </toggle-button>
-          <input type="search" placeholder="Search"
-            oninput="document.querySelector('div[slot=search]>query-search').setAttribute('query', event.target.value)" />
-          <query-search @type="query-search>paged-view%page"
-            @data="query-search order-list%data;query-search user-list%data">
-            <paged-view>
-              <order-list slot="orders" $name="h3>text-display.name%content" $price="h3 text-display.price%content"
-                $description="p>text-display%content" $order_id="small>text-display.order%content;button%order_id"
-                $created_at="small>text-display.created_at%content" $image_urls="image-list%data">
-                <div slot="item">
-                  <h3>
-                    <text-display class="name"></text-display>
-                    <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
-                    <button type="button"
-                      onclick="document.querySelector('order-details').setAttribute('current', event.target.getAttribute('order_id'))">
-                      Details
-                    </button>
-                  </h3>
-                  <p>
-                    Description:
-                    <br />
-                    <text-display></text-display>
-                  </p>
-                  <div>
-                    <image-list $src="%src">
-                      <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
-                    </image-list>
-                  </div>
-                  <small>
-                    <text-display class="order"></text-display>
-                    created at <text-display class="created_at"></text-display>
-                  </small>
-                </div>
-              </order-list>
-              <user-list slot="user" $id="profile-picture%user_id" $name="profile-picture+text-display%content">
-                <div slot="item">
-                  <h3>
-                    <profile-picture></profile-picture>
-                    <text-display></text-display>
-                  </h3>
-                </div>
-              </user-list>
-            </paged-view>
-          </query-search>
+            for a school project
+            @<a href="https://www.technischools.com/">technischools</a>
+          </h3>
         </div>
+        <bookmark-list $slot="if-equal-view%b">
+          <div slot="item">
+            <if-equal-view>
+              <router-view route="[]" $jwt="query-search%jwt" origin='{"name": "Home/", "data":{}, "type": "home"}'
+                @json="route-list%data"
+                onchange="document.querySelector('side-panel tab-button[value=browse]').toggleAttribute('selected', true)">
+                <div style="display: flex; flex-direction: row;">
+                  <route-list $href="a%href" $text="a>text-display%content" $i="a%i"
+                    style="display: flex; flex-direction: row;">
+                    <div slot="item">
+                      <a onclick="event.preventDefault();document.querySelector('if-equal-view[visible]>router-view').to(JSON.parse(this.getAttribute('i')))"
+                        style="color: gray;">
+                        <text-display></text-display>
+                      </a>
+                    </div>
+                  </route-list>
+                </div>
+                <div slot="home">
+                  <div>
+                    <button type="button"
+                      onclick="document.querySelector('if-equal-view[visible]>router-view').next({name: 'Search/', data: {}, type: 'search'})">
+                      Search
+                    </button>
+                    <button type="button"
+                      onclick="document.querySelector('if-equal-view[visible]>router-view').next({name: 'me', data: {id:null}, type: 'user'})">
+                      My profile
+                    </button>
+                  </div>
+                </div>
+                <div slot="search">
+                  <toggle-button @clicked="query-search%is_user">
+                    <span slot="off">searching orders</span>
+                    <span slot="on">searching users</span>
+                  </toggle-button>
+                  <input type="search" placeholder="Search"
+                    oninput="document.querySelector('div[slot=search]>query-search').setAttribute('query', event.target.value)" />
+                  <query-search @type="query-search>paged-view%page"
+                    @data="query-search order-list%data;query-search user-list%data">
+                    <paged-view>
+                      <order-list slot="orders" $name="h3>text-display.name%content"
+                        $price="h3 text-display.price%content" $description="p>text-display%content"
+                        $order_id="small>text-display.order%content;button%order_id"
+                        $created_at="small>text-display.created_at%content" $image_urls="image-list%data">
+                        <div slot="item">
+                          <h3>
+                            <text-display class="name"></text-display>
+                            <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
+                            <button type="button"
+                              onclick="document.querySelector('router-view[slot=browse]').root({name: `order-${this.getAttribute('order_id')}`, data: {id: JSON.parse(this.getAttribute('order_id'))}, type: 'order'})">
+                              Details
+                            </button>
+                          </h3>
+                          <p>
+                            Description:
+                            <br />
+                            <text-display></text-display>
+                          </p>
+                          <div>
+                            <image-list $src="%src">
+                              <img slot="item" style="max-width: 200px; max-height: 200px;"></img>
+                            </image-list>
+                          </div>
+                          <small>
+                            <text-display class="order"></text-display>
+                            created at <text-display class="created_at"></text-display>
+                          </small>
+                        </div>
+                      </order-list>
+                      <user-list slot="user" $id="profile-picture%user_id" $name="profile-picture+text-display%content">
+                        <div slot="item">
+                          <h3>
+                            <profile-picture></profile-picture>
+                            <text-display></text-display>
+                          </h3>
+                        </div>
+                      </user-list>
+                    </paged-view>
+                  </query-search>
+                </div>
+              </router-view>
+            </if-equal-view>
+          </div>
+        </bookmark-list>
         <div slot="offers">
           <query-my-offers @offers="query-my-offers>offer-list%data">
             <offer-list>
@@ -163,14 +199,14 @@
           </create-form>
           <query-my-orders @orders="query-my-orders>order-list%data">
             <order-list $name="h3>text-display.name%content" $price="h3 text-display.price%content"
-              $description="p>text-display%content" $order_id="small>text-display.order%content"
+              $description="p>text-display%content" $order_id="small>text-display.order%content;button%order_id"
               $created_at="small>text-display.created_at%content" $image_urls="image-list%data" $datum="button%order">
               <div slot="item">
                 <h3>
                   <text-display class="name"></text-display>
                   <span style="font-weight: bold;"><text-display class="price"></text-display> PLN</span>
                   <button type="button"
-                    onclick="document.querySelector('router-view[slot=orders]').next('details', event.target.getAttribute('order'))">
+                    onclick="document.querySelector('router-view[slot=browse]').root({name: `order-${this.getAttribute('order_id')}`, data: {id: JSON.parse(this.getAttribute('order_id'))}, type: 'order'})">
                     Details
                   </button>
                 </h3>
@@ -211,7 +247,7 @@
   <div style="flex-basis: 300px; display: flex; justify-content: flex-end;">
     <side-panel>
       <login-form @logged-out="side-panel>query-profile%hidden"
-        @jwt="profile-picture%jwt;query-profile%jwt;query-my-orders%jwt;create-form%jwt;query-search%jwt;owned-order-details%jwt;query-my-offers%jwt">
+        @jwt="profile-picture%jwt;query-profile%jwt;query-my-orders%jwt;create-form%jwt;router-view%jwt;owned-order-details%jwt;query-my-offers%jwt">
         <form slot="register" style="border: blue 1px solid; border-radius: 4px;">
           <input type="text" name="username" placeholder="Username" required />
           <input type="email" name="email" placeholder="Email" required />

@@ -1,11 +1,12 @@
 import { BaseElement, html } from "./base"
-type Fragment = { name: string, data: { [key: string]: unknown }, type: string }
+export type Fragment = { name: string, data: { [key: string]: unknown }, type: string }
 export default class RouterView extends BaseElement {
-    static override observedAttributes = [...super.observedAttributes, 'route', 'json', 'origin'];
+    static override observedAttributes = [...super.observedAttributes, 'route', 'json', 'origin', 'jwt'];
     private elements: { [href: string]: HTMLElement[] } = {}
     render() {
+        const jwt = this.getAttribute('jwt')
         const fragments: { data: Fragment, href: string }[] = (JSON.parse(this.getAttribute('route')!) as Fragment[]).reduce(
-            (p, c) => [...p, { data: c, href: p.at(-1)!.href + c.name + '/' }],
+            (p, c) => [...p, { data: c, href: p.at(-1)!.href + c.name }],
             [{ href: '/', data: JSON.parse(this.getAttribute('origin')!) }]
         )
         const json = JSON.stringify(fragments.map(({ href, data: { name } }, i) => ({ href, text: name, i })))
@@ -19,7 +20,7 @@ export default class RouterView extends BaseElement {
         if (!(current.href in this.elements)) {
             this.elements[current.href] = Array.from(this.children).filter(c => c.getAttribute('slot') === current.data.type).map(c => c.cloneNode(true) as HTMLElement)
         }
-        Object.entries(current.data).forEach(([k, v]) => {
+        Object.entries(jwt ? { ...current.data, jwt } : current.data).forEach(([k, v]) => {
             const mapping = this.getAttribute(`$${k}`)
             if (!mapping) return
             const stringified = JSON.stringify(v)
@@ -38,20 +39,22 @@ export default class RouterView extends BaseElement {
         })
         return html`
             <slot></slot>
-            <slot name="${current.href}"></slot>
+            ${{ id: current.href, elem: this.elements[current.href] }}
         `
     }
     attachCallbacks() { }
     prev() {
+        this.dispatchEvent(new Event('change'))
         const routes: Fragment[] = JSON.parse(this.getAttribute('route')!)
         this.setAttribute('route', JSON.stringify(routes.slice(0, -1)))
     }
     next(route: Fragment) {
+        this.dispatchEvent(new Event('change'))
         const routes: Fragment[] = JSON.parse(this.getAttribute('route')!)
         this.setAttribute('route', JSON.stringify([...routes, route]))
     }
     to(count: number) {
-        console.log(count)
+        this.dispatchEvent(new Event('change'))
         const routes: Fragment[] = JSON.parse(this.getAttribute('route')!)
         this.setAttribute('route', JSON.stringify(routes.slice(0, count)))
     }
