@@ -12,8 +12,8 @@ export default class RouterView extends BaseElement {
         ))
         if (this.getAttribute('json') !== json) this.setAttribute('json', json)
         const data = route.at(-1)?.data
-        const current_path = '/' + route.map(({ name }) => name).join('/')
-        if (data) this.querySelectorAll(`[slot="${current_path}"]`).forEach(slot => {
+        const current_slot = route.at(-1)?.name || '/'
+        if (data) this.querySelectorAll(`[slot="${current_slot}"]`).forEach(slot => {
             Object.entries(data).forEach(([key, value]) => {
                 this.getAttribute(`$${key}`)?.split(';').forEach(partial => {
                     const [path, name] = partial.split('%')
@@ -25,7 +25,7 @@ export default class RouterView extends BaseElement {
         })
         return html`
             <slot></slot>
-            <slot name="${current_path}"></slot>
+            <slot name="${current_slot}"></slot>
         `
     }
     attachCallbacks() { }
