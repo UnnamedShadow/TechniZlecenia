@@ -1,8 +1,9 @@
 import { BaseElement, html } from "./base"
 export default abstract class TemplateList<T> extends BaseElement {
-    static override observedAttributes = [...super.observedAttributes, 'data'];
+    static override observedAttributes = [...super.observedAttributes, 'data', 'passthrough'];
     protected elements: { [key: string]: HTMLElement[] } = {}
     render() {
+        const passthrough = Object.fromEntries((this.getAttribute('passthrough') || '').split(';').map(p => [p, this.getAttribute(p)]))
         const current_keys = Object.keys(this.elements)
         const list = (JSON.parse(this.getAttribute('data')!) as T[]).map(this.each)
         current_keys.forEach(key => {
@@ -16,7 +17,7 @@ export default abstract class TemplateList<T> extends BaseElement {
         list.forEach(({ data, key }) => {
             if (!(key in this.elements))
                 this.elements[key] = Array.from(this.children).filter(c => c.getAttribute('slot') === 'item').map(c => c.cloneNode(true) as HTMLElement)
-            Object.entries({ ...data, datum: JSON.stringify(data) }).forEach(([k, v]) => {
+            Object.entries({ ...data, datum: JSON.stringify(data), ...passthrough }).forEach(([k, v]) => {
                 const mapping = this.getAttribute(`$${k}`)
                 if (!mapping) return
                 mapping.split(';').forEach(partial => {

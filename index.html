@@ -95,12 +95,11 @@
             @<a href="https://www.technischools.com/">technischools</a>
           </h3>
         </div>
-        <bookmark-list $slot="if-equal-view%b">
+        <bookmark-list passthrough="jwt" $slot="if-equal-view%b" $jwt="router-view%jwt">
           <div slot="item">
             <if-equal-view>
-              <router-view route="[]" $jwt="query-search%jwt" origin='{"name": "Home/", "data":{}, "type": "home"}'
-                @json="route-list%data"
-                onchange="document.querySelector('side-panel tab-button[value=browse]').toggleAttribute('selected', true)">
+              <router-view passthrough="jwt" route="[]" $jwt="query-search%jwt"
+                origin='{"name": "Home/", "data":{}, "type": "home"}' @json="route-list%data">
                 <div style="display: flex; flex-direction: row;">
                   <route-list $href="a%href" $text="a>text-display%content" $i="a%i"
                     style="display: flex; flex-direction: row;">
@@ -125,14 +124,14 @@
                   </div>
                 </div>
                 <div slot="search">
-                  <toggle-button @clicked="query-search%is_user">
+                  <toggle-button @clicked="if-equal-view[visible] div[current] query-search%is_user">
                     <span slot="off">searching orders</span>
                     <span slot="on">searching users</span>
                   </toggle-button>
                   <input type="search" placeholder="Search"
-                    oninput="document.querySelector('div[slot=search]>query-search').setAttribute('query', event.target.value)" />
-                  <query-search @type="query-search>paged-view%page"
-                    @data="query-search order-list%data;query-search user-list%data">
+                    oninput="document.querySelector('if-equal-view[visible] div[current] query-search').setAttribute('query', event.target.value)" />
+                  <query-search @type="if-equal-view[visible] div[current] query-search>paged-view%page"
+                    @data="if-equal-view[visible] div[current] query-search order-list%data;if-equal-view[visible] div[current] query-search user-list%data">
                     <paged-view>
                       <order-list slot="orders" $name="h3>text-display.name%content"
                         $price="h3 text-display.price%content" $description="p>text-display%content"
@@ -247,7 +246,7 @@
   <div style="flex-basis: 300px; display: flex; justify-content: flex-end;">
     <side-panel>
       <login-form @logged-out="side-panel>query-profile%hidden"
-        @jwt="profile-picture%jwt;query-profile%jwt;query-my-orders%jwt;create-form%jwt;router-view%jwt;owned-order-details%jwt;query-my-offers%jwt">
+        @jwt="profile-picture%jwt;query-profile%jwt;query-my-orders%jwt;create-form%jwt;owned-order-details%jwt;query-my-offers%jwt;bookmark-list%jwt">
         <form slot="register" style="border: blue 1px solid; border-radius: 4px;">
           <input type="text" name="username" placeholder="Username" required />
           <input type="email" name="email" placeholder="Email" required />

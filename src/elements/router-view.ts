@@ -1,10 +1,9 @@
 import { BaseElement, html } from "./base"
 export type Fragment = { name: string, data: { [key: string]: unknown }, type: string }
 export default class RouterView extends BaseElement {
-    static override observedAttributes = [...super.observedAttributes, 'route', 'json', 'origin', 'jwt'];
+    static override observedAttributes = [...super.observedAttributes, 'route', 'json', 'origin'];
     private elements: { [href: string]: HTMLElement[] } = {}
     render() {
-        const jwt = this.getAttribute('jwt')
         const fragments: { data: Fragment, href: string }[] = (JSON.parse(this.getAttribute('route')!) as Fragment[]).reduce(
             (p, c) => [...p, { data: c, href: p.at(-1)!.href + c.name }],
             [{ href: '/', data: JSON.parse(this.getAttribute('origin')!) }]
@@ -20,7 +19,8 @@ export default class RouterView extends BaseElement {
         if (!(current.href in this.elements)) {
             this.elements[current.href] = Array.from(this.children).filter(c => c.getAttribute('slot') === current.data.type).map(c => c.cloneNode(true) as HTMLElement)
         }
-        Object.entries(jwt ? { ...current.data, jwt } : current.data).forEach(([k, v]) => {
+        const passthrough = Object.fromEntries((this.getAttribute('passthrough') || '').split(';').map(p => [p, this.getAttribute(p)]))
+        Object.entries({ ...current.data, ...passthrough }).forEach(([k, v]) => {
             const mapping = this.getAttribute(`$${k}`)
             if (!mapping) return
             const stringified = JSON.stringify(v)
@@ -36,6 +36,9 @@ export default class RouterView extends BaseElement {
                     )
                 })
             })
+        })
+        this.elements[current.href].forEach(el => {
+            el.toggleAttribute('current', true)
         })
         return html`
             <slot></slot>
